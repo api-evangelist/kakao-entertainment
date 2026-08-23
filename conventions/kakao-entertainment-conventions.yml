@@ -1,0 +1,154 @@
+generated: '2026-08-23'
+method: derived
+source: mcp/kakao-entertainment-melon-tools-list.json
+sources:
+- https://mcp.melon.com/mcp
+- https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+- https://cola.melon.com/.well-known/oauth-authorization-server
+note: >-
+  Kakao Entertainment publishes no OpenAPI and no REST convention guide. These conventions are derived
+  from the 18 tool contracts returned live by the Melon MCP server's tools/list on 2026-08-23 and from
+  the provider's own integration guide. Where a convention has no published basis it is recorded as
+  undocumented rather than guessed.
+interface_style: mcp
+transport:
+  protocol: Model Context Protocol over Streamable HTTP
+  endpoint: https://mcp.melon.com/mcp
+  framing: JSON-RPC 2.0 over text/event-stream
+  sse_supported: false
+  note: The provider states clients must implement Streamable HTTP; SSE transport is not supported.
+authentication:
+  style: OAuth 2.0 authorization code with PKCE (S256)
+  bearer: Access token issued by https://cola.melon.com
+  anonymous_surface: >-
+    tools/list answers anonymously and returns the full tool set with input and output schemas. Tool
+    invocation requires an authorized token; personalization tools additionally require an active Melon
+    subscription per the provider.
+  detail: authentication/kakao-entertainment-authentication.yml
+  scopes: scopes/kakao-entertainment-scopes.yml
+pagination:
+  documented: true
+  basis: derived from tool inputSchema properties
+  styles:
+  - name: page-and-limit
+    params:
+    - page
+    - limit
+    page_default: 1
+    page_minimum: 1
+    limit_defaults_observed:
+    - 10
+    - 50
+    - 100
+    limit_maximum: 100
+    used_by:
+    - get_playlist_tracks
+    - get_artist_contents
+    - get_music_contents_by_genre
+    - get_recently_played_music_contents
+    - get_my_created_playlists
+    - get_my_most_listened_songs
+    - get_latest_music_contents
+    - search_melon_music_contents
+  - name: start-and-size
+    params:
+    - start
+    - size
+    start_default: 1
+    start_minimum: 1
+    size_maximums_observed:
+    - 30
+    - 50
+    - 100
+    used_by:
+    - get_music_chart
+    - get_my_liked_music_contents
+    - recommend_personalized_songs_by_dj_mallang
+  - name: index-cursor
+    params:
+    - index
+    used_by:
+    - get_melon_curated_playlists
+  inconsistency: >-
+    Two different pagination vocabularies coexist on the same server - page/limit and start/size - with
+    no published rule for which tool uses which. An agent must read each tool's inputSchema rather than
+    apply one convention across the surface. Recorded as an observed inconsistency, not a defect claim.
+  response_fields: undocumented
+output_contracts:
+  output_schema_present: 16
+  output_schema_absent: 2
+  tools_without_output_schema:
+  - get_genres
+  - get_song_streaming_report
+  note: >-
+    16 of 18 tools return a declared JSON Schema outputSchema alongside their inputSchema, so an agent
+    can type the response as well as the request. This is unusually complete for an MCP server and is
+    the closest thing this provider ships to a response contract.
+tool_annotations:
+  published: true
+  basis: MCP tool annotations returned by tools/list
+  read_only_hint_true: 18
+  destructive_hint_false: 18
+  idempotent_hint_true: 18
+  open_world_hint_true: 14
+  open_world_hint_false: 4
+  note: >-
+    Every tool on the server is annotated readOnlyHint true, destructiveHint false and idempotentHint
+    true by the provider. Taken together with the tool set itself, the public agent surface performs no
+    state mutation.
+idempotency:
+  state: na
+  reason: >-
+    The public surface exposes no write operation, so there is no request-replay hazard for an
+    idempotency key to protect against. The provider nonetheless annotates all 18 tools idempotentHint
+    true. No Idempotency pointer is emitted, because no idempotency-key mechanism is published.
+  evidence: mcp/kakao-entertainment-melon-tools-list.json
+dry_run_mode:
+  state: na
+  reason: No write surface, so there is nothing to rehearse.
+reversibility:
+  state: na
+  grade: na
+  reason: >-
+    Every one of the 18 published tools is read-only. The only tool with a verb-like name,
+    create_playback_url, is annotated readOnlyHint true and destructiveHint false by the provider - it
+    composes and returns a melon.com playback URL for supplied content IDs rather than mutating any
+    server-side state. There is therefore no action an agent can take through this API that would need
+    reversing, and no cancel / refund / void / undo / restore operation exists or is needed.
+  write_surfaces: []
+  caveat: >-
+    The integration guide's overview prose says users can "manage personal music collections and
+    playlists", and its Security Best Practices section recommends user confirmation before critical
+    actions such as playing music or managing playlists. No playlist-mutation tool is present in the
+    live tool set, so that capability is either unreleased or gated. If Melon adds one, reversibility
+    must be re-measured; today na is the accurate reading of what is actually callable.
+  evidence:
+  - url: https://mcp.melon.com/mcp
+    observation: 18/18 tools annotated readOnlyHint true, destructiveHint false
+  - url: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+    observation: Guide recommends explicit user confirmation for playback and playlist actions
+versioning:
+  documented: false
+  note: >-
+    No API version appears in the endpoint path, in tool names, or in the integration guide. The
+    authorization platform is separately versioned in its own path (/auth/v3/). The MCP server itself
+    is described only as beta.
+error_envelope:
+  style: JSON-RPC 2.0 error framing
+  problem_json: false
+  catalog: errors/kakao-entertainment-problem-types.yml
+rate_limit_signal:
+  documented: false
+  headers: []
+  note: >-
+    No rate-limit headers and no documented quotas. See rate-limits/kakao-entertainment-rate-limits.yml.
+request_tracing:
+  documented: false
+  note: No request-id or correlation-id convention is published.
+localization:
+  ui_locales_supported:
+  - ko
+  content: >-
+    Tool descriptions are written in English with embedded Korean example prompts; catalogue content is
+    predominantly Korean. get_latest_music_contents takes a region filter separating domestic (Korean)
+    from international releases.

@@ -1,0 +1,34 @@
+generated: '2026-08-23'
+method: searched
+source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+sources:
+- https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+- https://www.kakaoent.com/
+- https://www.melon.com/index.htm
+plan_count: 0
+note: >-
+  Kakao Entertainment publishes no developer plans, no API pricing page and no metered API tiers. There
+  is no developer portal to price against. Access to the only public machine-readable surface, the Melon
+  MCP server, is not sold as an API product: it is gated by a consumer Melon account plus, for the
+  personalization tools, an active Melon streaming subscription, and by a per-partner OAuth allowlist
+  that Melon administers by email. This is an honest zero, recorded rather than omitted.
+access_model:
+  pricing: not-published
+  onboarding: allowlist
+  self_serve: false
+  trial: false
+  public: true
+  public_note: The MCP endpoint is publicly reachable and tools/list answers anonymously.
+  requirements:
+  - A compatible MCP client (Claude.ai / Claude Desktop, Kakao PlayMCP, or any MCP client implementing
+    Streamable HTTP)
+  - Valid Melon account credentials
+  - Active Melon subscription, which the provider states may be required for full access to premium
+    features and is required for personalization features
+  - Redirect URI and client credentials registered with Melon via melon_info@kakaoent.com
+  source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+plans: []
+consumer_pricing_note: >-
+  Melon sells consumer streaming vouchers on melon.com in Korean and Korean won, and Kakao Page and
+  Kakao Webtoon sell in-app currency for episode unlocks. Those are consumer subscription products, not
+  API plans, and are deliberately not recorded here as plans.

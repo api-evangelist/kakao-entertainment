@@ -1,0 +1,286 @@
+generated: '2026-08-23'
+method: probed
+source: https://mcp.melon.com/mcp
+docs: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+status: published
+note: 'First-party remote MCP server operated by Melon, a Kakao Entertainment music service. Ownership
+  is established by the provider''s own publication: the integration guide is published on Kakao Entertainment''s
+  engineering blog (tech.kakaoent.com) by its AI Application Technology team, and the guide directs client-registration
+  requests to melon_info@kakaoent.com. The provider marks the server beta. The tool list below was read
+  live and anonymously from tools/list on 2026-08-23; it is the authoritative contract and it differs
+  from the tool names printed in the blog guide (see documentation_divergence).'
+deployment:
+  mode: remote
+  endpoint: https://mcp.melon.com/mcp
+  auth: oauth
+  verified: probed
+server:
+  name: melon
+  transport: http
+  protocol: streamable-http
+  url: https://mcp.melon.com/mcp
+  sse_supported: false
+  note: Provider documentation states clients must support Streamable HTTP, not SSE.
+authentication:
+  type: oauth2
+  authorization_server: https://cola.melon.com
+  metadata: https://cola.melon.com/.well-known/oauth-authorization-server
+  discovery_redirect: https://mcp.melon.com/.well-known/oauth-authorization-server 301 -> https://cola.melon.com/.well-known/oauth-authorization-server
+  dynamic_client_registration: https://cola.melon.com/auth/v3/oauth/register
+  allowlisted: true
+  allowlist_note: The server is publicly reachable and tools/list answers anonymously, but the OAuth redirect-URI
+    allowlist and client-credential issuance are managed by Melon; the provider directs partners to melon_info@kakaoent.com
+    to register before use.
+supported_clients:
+- name: Claude.ai / Claude Desktop
+  vendor: Anthropic
+- name: PlayMCP
+  vendor: Kakao
+x-evidence:
+  fetched: '2026-08-23'
+  method: POST tools/list (JSON-RPC 2.0), anonymous
+  url: https://mcp.melon.com/mcp
+  http_status: 200
+  content_type: text/event-stream
+  tool_count: 18
+  verbatim_file: kakao-entertainment-melon-tools-list.json
+tool_count: 18
+tools:
+- name: get_music_chart
+  description: '[Purpose] Retrieves various official music ranking charts from Melon(멜론). [Details] Returns
+    music rankings based on multiple criteria, including TOP 100, Daily/Weekly, and HOT TRACK. The response
+    includes each song''s rank, title, artist, and ID. [Usage Guide] - Use when users request music rankings.
+    —"TOP 100 차트 보여 ...'
+  parameters:
+  - chart_type
+  - start
+  - size
+  - hot_100_filter
+  required:
+  - chart_type
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/0/inputSchema
+- name: get_playlist_tracks
+  description: '[Purpose] Retrieves tracks in a specific playlist on Melon(멜론) using its ID. [Details]
+    Retrieves detailed information for all tracks included in the specified playlist using the playlist
+    ID. The response includes each track''s title, artist, and ID. [Usage Guide] Use when users request
+    the tracks in a specific playl ...'
+  parameters:
+  - playlist_seq
+  - page
+  - limit
+  - service_available
+  required:
+  - playlist_seq
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/1/inputSchema
+- name: get_music_content_details
+  description: '[Purpose] Retrieves detailed information about songs, albums, and artists on Melon(멜론)
+    using their IDs. [Details] Uses content IDs obtained from other tools (e.g., search, chart) to retrieve
+    detailed information such as release date, genre, and description. The tool supports parallel processing
+    for retrieving multi ...'
+  parameters:
+  - content_type
+  - content_ids
+  required:
+  - content_type
+  - content_ids
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/2/inputSchema
+- name: get_artist_contents
+  description: '[Purpose] Retrieves a list of tracks or albums for a specific artist from Melon(멜론). [Details]
+    Retrieves specific artist''s tracks or albums by using the artist ID, with filters based on participation
+    type (all, featuring, lyricist/composer, etc.). If multiple versions of the same track (e.g., remix,
+    live) exist, th ...'
+  parameters:
+  - artist_id
+  - content_type
+  - participation_type
+  - sort_order
+  - page
+  - limit
+  required:
+  - artist_id
+  - content_type
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/3/inputSchema
+- name: get_music_content_url
+  description: '[Purpose] Returns detail page URLs for content on Melon(멜론), such as songs, albums, or
+    playlists. [Details] Generates and returns web URLs for viewing detailed information about content.
+    [Usage Guide] Use when users request detailed information about specific content —"이 노래 정보 보여줘", "앨범
+    정보"— or when providing an ad ...'
+  parameters:
+  - content_type
+  - content_id
+  required:
+  - content_type
+  - content_id
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/4/inputSchema
+- name: get_genres
+  description: '[Purpose] Retrieves main genres and all their sub-genres on Melon(멜론) in a nested structure.
+    [Details] Specify genre_code to retrieve information for the corresponding genre and its sub-genres
+    only. If omitted, retrieves all available genres. Returns a mapping of genre codes to their descriptions
+    and sub-genres. [U ...'
+  parameters:
+  - genre_code
+  required: []
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/5/inputSchema
+- name: get_music_contents_by_genre
+  description: '[Purpose] Retrieves a list of songs, playlists, or classic albums belonging to a specific
+    music genre on Melon(멜론). [Details] - ''songs'': returns all songs classified under the genre, with
+    optional sub-genre filtering. - ''popular_songs'': returns the genre''s hot tracks from Melon''s official
+    curated "Hot Tracks" playl ...'
+  parameters:
+  - content_type
+  - genre_code
+  - sub_genre_code
+  - page
+  - limit
+  required:
+  - content_type
+  - genre_code
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/6/inputSchema
+- name: get_recently_played_music_contents
+  description: '[Purpose] Retrieves users'' recently played songs or recently viewed playlists on Melon(멜론).
+    [Details] Retrieves a list of ''recently played songs'' or ''recently viewed playlists'' based on
+    the user''s listening and viewing history. The API provides a fixed maximum of 100 items. The page/limit
+    parameters only paginate w ...'
+  parameters:
+  - content_type
+  - page
+  - limit
+  required:
+  - content_type
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/7/inputSchema
+- name: get_my_created_playlists
+  description: '[Purpose] Retrieves a list of playlists ''created by me'' on Melon(멜론). [Details] Retrieves
+    playlists the user has created and owns: standard playlists (''My Playlist''), DJ playlists (''My
+    DJ Playlist''), and the full list of user-created playlists. [Usage Guide] Use when users request
+    their own playlists. —"내가 만든 플레이리스 ...'
+  parameters:
+  - playlist_type
+  - page
+  - limit
+  required: []
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/8/inputSchema
+- name: get_my_most_listened_songs
+  description: '[Purpose] Retrieves the ranking of the user''s most played songs over a specified period
+    on Melon(멜론). [Details] - Retrieves a ranked list of the most played songs based on the user''s listening
+    statistics for one of the following periods: the last 1 week, 1 month, 3 months, a specific month
+    (YYYYMM), or a specific d ...'
+  parameters:
+  - date_type
+  - term_list
+  - page
+  - limit
+  required: []
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/9/inputSchema
+- name: get_my_liked_music_contents
+  description: '[Purpose] Retrieves a list of all types of content the user has ''liked'' on Melon(멜론).
+    [Details] This tool provides comprehensive access to users'' liked content across multiple categories.
+    Retrieves all content types that the user has ''liked'', including songs, albums, playlists (standard
+    playlists, DJ playlists, art ...'
+  parameters:
+  - content_type
+  - start
+  - size
+  required:
+  - content_type
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/10/inputSchema
+- name: get_latest_music_contents
+  description: '[Purpose] Retrieves a list of newly released songs, albums, and videos on Melon(멜론), sorted
+    by release date. [Details] Applies region filters (domestic/international) when retrieving a list
+    of newly released content. [Usage Guide] Use when users request newly released content regardless
+    of ranking. —"새로 나온 노래 뭐 있어? ...'
+  parameters:
+  - content_type
+  - region
+  - page
+  - limit
+  required:
+  - content_type
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/11/inputSchema
+- name: create_playback_url
+  description: '[Purpose] Generates a playback URL for given content (song, album, playlist, music video)
+    on Melon(멜론). [Details] Generates and returns web URLs that allow users to play content directly.
+    [Usage Guide] - Play songs: Pass a list of song_id values into the song_ids parameter. - Play playlists:
+    Pass a list of playlist ...'
+  parameters:
+  - song_ids
+  - playlist_seqs
+  - album_ids
+  - mv_id
+  required: []
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/12/inputSchema
+- name: get_melon_curated_playlists
+  description: '[Purpose] Retrieves a list of official playlists curated and recommended by Melon(멜론).
+    [Details] Retrieves playlists from Melon''s official recommendation categories, such as ''Daily Pick'',
+    ''Today''s Playlist'', and ''Theme Recommendation''. [Usage Guide] Use when users request Melon''s
+    official recommendations. —"멜론 추천 플 ...'
+  parameters:
+  - recommend_type
+  - index
+  - include_songs
+  required:
+  - recommend_type
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/13/inputSchema
+- name: search_melon_music_contents
+  description: '[Purpose] Searches for all types of content on Melon(멜론)—songs, albums, artists, videos,
+    playlists—using keywords. [Details] Performs a unified search based on user-provided keywords, or
+    narrows the search scope by specifying a content type. Search results include unique IDs that can
+    be used in other tools. [Usage  ...'
+  parameters:
+  - keyword
+  - content_types
+  - sort_order
+  - page
+  - limit
+  required:
+  - keyword
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/14/inputSchema
+- name: recommend_personalized_songs_by_dj_mallang
+  description: '[Purpose] Provides personalized song recommendations based on the user''s music preference
+    on Melon(멜론). [Details] Uses Melon''s personalized recommendation engine, "DJ Mallang (DJ말랑이)", to
+    comprehensively analyze the user''s listening history, likes, and playlists in order to recommend
+    new songs the user is likely to ...'
+  parameters:
+  - size
+  required: []
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/15/inputSchema
+- name: recommend_similar_songs_by_dj_mallang
+  description: '[Purpose] Recommends other songs with a similar mood or genre to the specific song on
+    Melon(멜론). [Details] Analyzes the musical characteristics of the reference song to recommend up to
+    30 other songs with similar styles. [Usage Guide] Use when users request songs similar to the reference
+    song. —"이 노래랑 비슷한 노래 찾아줘",  ...'
+  parameters:
+  - song_id
+  required:
+  - song_id
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/16/inputSchema
+- name: get_song_streaming_report
+  description: '[Purpose] Provides streaming statistics or personal listening history for a specific song
+    on Melon(멜론). [Details] Provides two types of reports depending on report_type: - ''public'': Quickly
+    assesses the song''s overall popularity on Melon through key metrics (total streaming count, total
+    number of listeners). - ''my'' ...'
+  parameters:
+  - song_id
+  - report_type
+  required:
+  - song_id
+  - report_type
+  input_schema: mcp/kakao-entertainment-melon-tools-list.json#/result/tools/17/inputSchema
+documentation_divergence:
+  note: The published integration guide names tools the live server does not expose under those names,
+    and the live server exposes tools the guide does not name. Recorded as a real divergence between the
+    provider's documentation and its running server; live names are authoritative and nothing was reconciled
+    or invented.
+  source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+  documented_not_live:
+  - get_artist_songs
+  - get_main_genres
+  - get_my_followed_artists
+  - get_my_song_streaming_history
+  - get_song_streaming_stats
+  - search_melon_magazines
+  live_not_documented:
+  - get_artist_contents
+  - get_genres
+  - get_melon_curated_playlists
+  - get_music_content_url
+  - get_song_streaming_report

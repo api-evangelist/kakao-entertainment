@@ -1,0 +1,41 @@
+generated: '2026-08-23'
+method: searched
+source: Registry searches on 2026-08-23
+package_count: 0
+official_package_count: 0
+note: >-
+  No first-party Kakao Entertainment or Melon client library exists on any public registry, and none is
+  referenced by the provider. This is consistent with the shape of the surface: the Melon MCP server is
+  remote-only, so integration is a URL in an MCP client's configuration rather than a dependency in a
+  build. There is no npm scope, no PyPI project, no CDN-distributed component and no source repository
+  to version. Recorded as a checked zero, not an unchecked gap - and no SDKs or Packages pointer is
+  emitted, because emitting one would credit a library that does not exist.
+registries_checked:
+- registry: npm
+  method: registry.npmjs.org search plus direct package lookups
+  queries:
+  - melon mcp
+  - '@kakaoent/melon-mcp'
+  - melon-mcp
+  - '@melon/mcp'
+  result: no first-party package; all direct lookups returned HTTP 404
+- registry: npm
+  method: organisation scope check
+  queries:
+  - '@kakaoent'
+  result: no published scope
+- registry: github
+  method: api.github.com/orgs/kakaoent
+  result: >-
+    The organisation exists and is named "Kakao Entertainment" with website https://kakaoent.com, but
+    reports public_repos 0 - there is no public source to package.
+- registry: pypi
+  result: no first-party project referenced by the provider or found by name
+- registry: cdn
+  result: >-
+    No script tag, unpkg or jsDelivr distribution. The provider ships no browser component.
+packages: []
+version: null
+version_note: >-
+  No package exists on any registry, so there is no version or publication date to record. Null here
+  means checked and absent, not unchecked.

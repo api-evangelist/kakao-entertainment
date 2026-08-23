@@ -1,0 +1,1110 @@
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "tools": [
+      {
+        "name": "get_music_chart",
+        "description": "\n[Purpose] Retrieves various official music ranking charts from Melon(멜론).\n\n[Details] Returns music rankings based on multiple criteria, including TOP 100, Daily/Weekly, and HOT TRACK.\nThe response includes each song's rank, title, artist, and ID.\n\n[Usage Guide]\n- Use when users request music rankings. —\"TOP 100 차트 보여줘\", \"오늘 인기 제일 많은 노래 뭐야?\"\n- If a request includes both a specific time period (e.g., daily/weekly) and additional conditions, such as \"이번주 인기 발라드 알려줘\", it is recommended to first retrieve the chart for the specified period using this tool and then apply additional filtering to the results.\n- If needed, use chart_url to view the chart directly on the Melon website.\n",
+        "inputSchema": {
+          "properties": {
+            "chart_type": {
+              "description": "Type of chart on Melon (멜론) to retrieve. Options: 'TOP_100' (realtime), 'DAILY' (daily), 'WEEKLY' (weekly), 'HOT_TRACK_LIKE' (likes-based), 'HOT_TRACK_SEARCH' (search-based), 'HOT_TRACK_DJ' (DJ-based), 'HOT_100' (released within the last 30 or 100 days).",
+              "enum": [
+                "TOP_100",
+                "DAILY",
+                "WEEKLY",
+                "HOT_TRACK_LIKE",
+                "HOT_TRACK_SEARCH",
+                "HOT_TRACK_DJ",
+                "HOT_100"
+              ],
+              "title": "Chart Type",
+              "type": "string"
+            },
+            "start": {
+              "default": 1,
+              "description": "The rank position to start from (1-based). For example, start=1 returns from the 1st place, start=11 returns from the 11th place.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Start",
+              "type": "integer"
+            },
+            "size": {
+              "default": 30,
+              "description": "Number of songs to retrieve from the chart. For example, entering 10 returns the top 10 songs. Maximum is 30.",
+              "maximum": 30,
+              "minimum": 1,
+              "title": "Size",
+              "type": "integer"
+            },
+            "hot_100_filter": {
+              "default": "D30",
+              "description": "Release date filter for the HOT 100 chart. 'D30' shows songs released within 30 days, 'D100' within 100 days. Not applicable to other chart types.",
+              "enum": [
+                "D30",
+                "D100"
+              ],
+              "title": "Hot 100 Filter",
+              "type": "string"
+            }
+          },
+          "required": [
+            "chart_type"
+          ],
+          "title": "get_music_chartArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_music_chartOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get Melon chart",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_playlist_tracks",
+        "description": "\n[Purpose] Retrieves tracks in a specific playlist on Melon(멜론) using its ID.\n\n[Details] Retrieves detailed information for all tracks included in the specified playlist using the playlist ID.\nThe response includes each track's title, artist, and ID.\n\n[Usage Guide] Use when users request the tracks in a specific playlist. —\"이 플레이리스트에 있는 노래 목록 보여줘\".\n",
+        "inputSchema": {
+          "properties": {
+            "playlist_seq": {
+              "description": "Unique ID of the playlist on Melon (멜론) to retrieve tracks from.",
+              "title": "Playlist Seq",
+              "type": "string"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number for the results.",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "limit": {
+              "default": 100,
+              "description": "Number of songs to display per page.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            },
+            "service_available": {
+              "default": true,
+              "description": "Whether to retrieve only songs available for streaming. If True, returns only available songs; if False, returns all songs.",
+              "title": "Service Available",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "playlist_seq"
+          ],
+          "title": "get_playlist_tracksArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_playlist_tracksOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get playlist tracks",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_music_content_details",
+        "description": "\n[Purpose] Retrieves detailed information about songs, albums, and artists on Melon(멜론) using their IDs.\n\n[Details] Uses content IDs obtained from other tools (e.g., search, chart) to retrieve detailed information such as release date, genre, and description.\nThe tool supports parallel processing for retrieving multiple IDs in a single request.\n\nFor single-ID queries, the result is returned directly.\nFor multiple-ID queries, results are returned grouped by each ID.\n\n[Usage Guide]\n- Single Retrieval: Use when detailed information for a specific content is required. —\"이 앨범 소개글 보여줘\", \"이 가수 정보 알려줘\"\n- Batch Retrieval: Use when querying information for multiple content items at once. —\"이 앨범들의 발매일 알려줘\"\n\n[Integration]\nUse IDs obtained from `search_melon_music_contents` or `get_music_chart` as input for the content_ids parameter to retrieve detailed information.\n",
+        "inputSchema": {
+          "properties": {
+            "content_type": {
+              "description": "Type of content on Melon (멜론) to retrieve details for. Choose from 'song', 'album', or 'artist'.",
+              "enum": [
+                "song",
+                "album",
+                "artist"
+              ],
+              "title": "Content Type",
+              "type": "string"
+            },
+            "content_ids": {
+              "description": "List of unique content IDs to retrieve details for. Use ['ID'] for a single item or ['ID1', 'ID2', 'ID3'] for multiple items.",
+              "items": {
+                "type": "string"
+              },
+              "title": "Content Ids",
+              "type": "array"
+            }
+          },
+          "required": [
+            "content_type",
+            "content_ids"
+          ],
+          "title": "get_music_content_detailsArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_music_content_detailsOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get music content details",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_artist_contents",
+        "description": "\n[Purpose] Retrieves a list of tracks or albums for a specific artist from Melon(멜론).\n\n[Details]\nRetrieves specific artist's tracks or albums by using the artist ID, with filters based on participation type (all, featuring, lyricist/composer, etc.).\nIf multiple versions of the same track (e.g., remix, live) exist, they are deduplicated and returned as a single entry.\n\n[Usage Guide]\n- Use when users request tracks by a specific artist —\"아이유 노래 목록 보여줘\", \"박재범이 피처링한 노래 찾아줘\".\n- Use when users request artist's album lists (discography) —\"아이유 앨범 보여줘\", \"아이유 디스코그래피 알려줘\".\n- To retrieve an artist's top/representative tracks, set the participation type as 'ALL' and sort by popularity.\n\n[Distinction] `get_music_content_details` returns detailed information for a single track, album, or an artist profile.\nIn contrast, this tool returns the full track list or album list of an artist.\n",
+        "inputSchema": {
+          "properties": {
+            "artist_id": {
+              "description": "Unique ID of the artist on Melon (멜론) to retrieve songs or albums for.",
+              "title": "Artist Id",
+              "type": "string"
+            },
+            "content_type": {
+              "description": "Type of content to retrieve. Choose from 'songs' (song list) or 'albums' (album list / discography).",
+              "enum": [
+                "songs",
+                "albums"
+              ],
+              "title": "Content Type",
+              "type": "string"
+            },
+            "participation_type": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "A",
+                    "F",
+                    "LC",
+                    "L",
+                    "C"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Participation type filter, only applicable when retrieving songs. Choose from 'A' (all), 'F' (featuring), 'LC' (lyricist/composer), 'L' (lyricist), 'C' (composer). Ignored when retrieving albums.",
+              "title": "Participation Type"
+            },
+            "sort_order": {
+              "default": "NEW",
+              "description": "Sort order for the results. Choose from 'NEW' (newest first), 'ALPHABET' (alphabetical), or 'POP' (popularity).",
+              "enum": [
+                "NEW",
+                "ALPHABET",
+                "POP"
+              ],
+              "title": "Sort Order",
+              "type": "string"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number for the results.",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "limit": {
+              "default": 100,
+              "description": "Number of items to display per page.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "artist_id",
+            "content_type"
+          ],
+          "title": "get_artist_contentsArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_artist_contentsOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get artist's songs or albums",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_music_content_url",
+        "description": "\n[Purpose] Returns detail page URLs for content on Melon(멜론), such as songs, albums, or playlists.\n\n[Details] Generates and returns web URLs for viewing detailed information about content.\n\n[Usage Guide] Use when users request detailed information about specific content —\"이 노래 정보 보여줘\", \"앨범 정보\"— or when providing an additional link.\nNote that playlists returned in search results are DJ playlists.\n\n[Integration]\nPass a content ID obtained from other tools (e.g., songId, albumId) to the content_id of this tool to generate a detail page URL, and include the URL in the response to the user.\n",
+        "inputSchema": {
+          "properties": {
+            "content_type": {
+              "description": "Type of content on Melon (멜론) to generate the detail page URL for. Choose from 'song', 'general_playlist', 'dj_playlist', 'album', 'magazine', or 'video'.",
+              "enum": [
+                "song",
+                "general_playlist",
+                "dj_playlist",
+                "album",
+                "magazine",
+                "video"
+              ],
+              "title": "Content Type",
+              "type": "string"
+            },
+            "content_id": {
+              "description": "Unique ID of the content on Melon (멜론) to generate the detail page URL for.",
+              "title": "Content Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "content_type",
+            "content_id"
+          ],
+          "title": "get_music_content_urlArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_music_content_urlOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get music content URL",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      {
+        "name": "get_genres",
+        "description": "\n[Purpose] Retrieves main genres and all their sub-genres on Melon(멜론) in a nested structure.\n\n[Details] Specify genre_code to retrieve information for the corresponding genre and its sub-genres only.\nIf omitted, retrieves all available genres.\nReturns a mapping of genre codes to their descriptions and sub-genres.\n\n[Usage Guide] Use when users request genre information.\nIdentify the most appropriate genre code from the returned list and use it as genre_code and sub_genre_code for `get_music_contents_by_genre` tool.\n\n[Integration] Use this tool in conjunction with `get_music_contents_by_genre`.\n",
+        "inputSchema": {
+          "properties": {
+            "genre_code": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Code of a specific main genre on Melon (멜론). If provided, returns that genre's information and its sub-genres. If omitted, returns only main genre codes and descriptions (without sub-genres).",
+              "title": "Genre Code"
+            }
+          },
+          "title": "get_genresArguments",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get genres",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      {
+        "name": "get_music_contents_by_genre",
+        "description": "\n[Purpose] Retrieves a list of songs, playlists, or classic albums belonging to a specific music genre on Melon(멜론).\n\n[Details]\n- 'songs': returns all songs classified under the genre, with optional sub-genre filtering.\n- 'popular_songs': returns the genre's hot tracks from Melon's official curated \"Hot Tracks\" playlist (operated by '장르HoTracks' DJ), reflecting the actual popularity ranking of the genre.\n- 'playlists': returns playlists featuring that genre.\n- 'masterpieces': returns classic/representative albums of that genre.\n\n[Usage Guide]\n- \"댄스 장르 노래 들려줘\", \"발라드 곡 보여줘\" → content_type=\"songs\"\n- \"인기 힙합곡 알려줘\", \"발라드 인기곡 추천해줘\" → content_type=\"popular_songs\"\n- \"인디 음악 플레이리스트 찾아줘\" → content_type=\"playlists\"\n- \"클래식 명반 보여줘\" → content_type=\"masterpieces\"\nAlways call `get_genres` first to obtain exact genre_code (and sub_genre_code for 'songs') before calling this tool.\n\n[Distinction] `search_melon_music_contents` uses contextual or mood-based keywords (e.g., \"Driving\", \"Studying\"), whereas this tool uses Melon's official music genre classification.\nIn contrast to `get_music_chart` with a genre filter — which intersects with the main chart and often yields sparse, out-of-order results — this tool's 'popular_songs' returns a dense, genre-native popularity ranking from a dedicated curated playlist.\n\n[Integration] Use this tool in conjunction with `get_genres` to help users easily find content within their desired genre.\n",
+        "inputSchema": {
+          "properties": {
+            "content_type": {
+              "description": "Type of content to retrieve.\n- 'songs': all tracks classified under the genre (with optional sub-genre filter, paginated).\n- 'popular_songs': the genre's hot tracks, ranked by Melon's official curated 'Hot Tracks' playlist for that genre.\n- 'playlists': playlists featuring that genre.\n- 'masterpieces': classic/representative albums of that genre.",
+              "enum": [
+                "songs",
+                "popular_songs",
+                "playlists",
+                "masterpieces"
+              ],
+              "title": "Content Type",
+              "type": "string"
+            },
+            "genre_code": {
+              "description": "Main genre code. Can be obtained from the 'get_genres' tool.",
+              "title": "Genre Code",
+              "type": "string"
+            },
+            "sub_genre_code": {
+              "default": null,
+              "description": "Sub-genre code. Can be obtained from the 'get_genres' tool. Only applicable when content_type is 'songs'; ignored otherwise.",
+              "title": "Sub Genre Code",
+              "type": "string"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number for the results.",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "limit": {
+              "default": 100,
+              "description": "Number of items to display per page. For 'popular_songs', the maximum is 50.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "content_type",
+            "genre_code"
+          ],
+          "title": "get_music_contents_by_genreArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_music_contents_by_genreOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get music contents by genre",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_recently_played_music_contents",
+        "description": "\n[Purpose] Retrieves users' recently played songs or recently viewed playlists on Melon(멜론).\n\n[Details] Retrieves a list of 'recently played songs' or 'recently viewed playlists' based on the user's listening and viewing history.\nThe API provides a fixed maximum of 100 items. The page/limit parameters only paginate within this fixed dataset.\n\n[Usage Guide] Use when users request their recent activity history. —\"최근에 들은 노래 뭐야?\", \"아까 봤던 플레이리스트 다시 보고 싶어\".\n",
+        "inputSchema": {
+          "properties": {
+            "content_type": {
+              "description": "Type of recent content to retrieve from Melon (멜론). Choose from 'songs' (recently played songs) or 'playlists' (recently viewed playlists).",
+              "enum": [
+                "songs",
+                "playlists"
+              ],
+              "title": "Content Type",
+              "type": "string"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number for the results.",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "limit": {
+              "default": 50,
+              "description": "Number of items to display per page.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "content_type"
+          ],
+          "title": "get_recently_played_music_contentsArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_recently_played_music_contentsOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get recently played music contents",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_my_created_playlists",
+        "description": "\n[Purpose] Retrieves a list of playlists 'created by me' on Melon(멜론).\n\n[Details] Retrieves playlists the user has created and owns:\nstandard playlists ('My Playlist'), DJ playlists ('My DJ Playlist'), and the full list of user-created playlists.\n\n[Usage Guide] Use when users request their own playlists. —\"내가 만든 플레이리스트 보여줘\", \"내 플레이리스트 목록\", \"내 DJ 플레이리스트 찾아줘\".\n\n[Distinction] `get_my_liked_music_contents` retrieves playlists that the user has liked,\nwhereas this tool retrieves playlists the user has created.\n",
+        "inputSchema": {
+          "properties": {
+            "playlist_type": {
+              "default": "all",
+              "description": "Type of playlist to retrieve from Melon (멜론). Choose from 'all' (all my playlists), 'general' (standard playlists), or 'dj_playlists' (my DJ playlists). Defaults to 'all'.",
+              "enum": [
+                "all",
+                "general",
+                "dj_playlists"
+              ],
+              "title": "Playlist Type",
+              "type": "string"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number for the results.",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "limit": {
+              "default": 50,
+              "description": "Number of playlists to display per page.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          "title": "get_my_created_playlistsArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_my_created_playlistsOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get my created playlists",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_my_most_listened_songs",
+        "description": "\n[Purpose] Retrieves the ranking of the user's most played songs over a specified period on Melon(멜론).\n\n[Details]\n- Retrieves a ranked list of the most played songs based on the user's listening statistics for one of the following periods: the last 1 week, 1 month, 3 months, a specific month (YYYYMM), or a specific date (YYYYMMDD).\n- Multiple periods can be queried in a single request.\n- A maximum of 100 songs can be retrieved per request.\n- term_list parameter supports both single-period and multiple-period queries.\nResponse is returned directly for single-period queries,\nwhile for multiple-period queries, responses are returned grouped by each period.\n\n[Usage Guide]\n- Single Period: \"내가 제일 많이 들은 노래 뭐야?\", \"지난 달에 가장 많이 들은 곡 알려줘\"\n- Multiple Periods: \"지난 3개월간 월별로 가장 많이 들은 곡들 보여줘\", \"12월과 1월 각각 가장 많이 들은 노래 비교해줘\"\n",
+        "inputSchema": {
+          "properties": {
+            "date_type": {
+              "default": "W",
+              "description": "Period filter for the listening statistics. Choose from 'W' (past week), '1M' (past month), '3M' (past 3 months), 'TERM' (specific month(s) in YYYYMM format), or 'DATE' (specific day(s) in YYYYMMDD format).",
+              "enum": [
+                "W",
+                "1M",
+                "3M",
+                "TERM",
+                "DATE"
+              ],
+              "title": "Date Type",
+              "type": "string"
+            },
+            "term_list": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Target period(s) to query. Use ['202312'] for a single period or ['202312', '202401'] for multiple periods. Format is 'YYYYMM' when date_type is 'TERM', or 'YYYYMMDD' when 'DATE'. Can be omitted for W/1M/3M.",
+              "title": "Term List"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number for the results.",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "limit": {
+              "default": 100,
+              "description": "Number of items to display per page. Maximum is 100.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          "title": "get_my_most_listened_songsArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_my_most_listened_songsOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get my most listened songs",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_my_liked_music_contents",
+        "description": "\n[Purpose] Retrieves a list of all types of content the user has 'liked' on Melon(멜론).\n\n[Details] This tool provides comprehensive access to users' liked content across multiple categories.\nRetrieves all content types that the user has 'liked', including songs, albums, playlists (standard playlists, DJ playlists, artist playlists, or all playlists if unspecified), videos, genres, and tags.\n\n[Usage Guide] Use when users request content related to their likes. —\"내가 좋아요 한 노래 목록 보여줘\", \"좋아요 누른 앨범들 찾아줘\".\n\n[Distinction]\n`get_my_created_playlists` retrieves playlists created by the user,\nwhereas this tool retrieves playlists that the user has 'liked'.\n",
+        "inputSchema": {
+          "properties": {
+            "content_type": {
+              "description": "Type of 'liked' content to retrieve from Melon (멜론).\n- `songs`: Liked songs\n- `albums`: Liked albums\n- `all_playlists`: All liked playlists (use this when no specific playlist type is needed)\n- `general_playlists`: Liked standard playlists\n- `dj_playlists`: Liked DJ playlists\n- `artist_playlists`: Liked artist playlists\n- `videos`: Liked videos\n- `genres`: Liked genres\n- `tags`: Liked tags",
+              "enum": [
+                "songs",
+                "albums",
+                "all_playlists",
+                "general_playlists",
+                "dj_playlists",
+                "artist_playlists",
+                "videos",
+                "genres",
+                "tags"
+              ],
+              "title": "Content Type",
+              "type": "string"
+            },
+            "start": {
+              "default": 1,
+              "description": "Index of the first item to return. Begins at 1.",
+              "minimum": 1,
+              "title": "Start",
+              "type": "integer"
+            },
+            "size": {
+              "default": 100,
+              "description": "Number of items to retrieve per request. Must be between 1 and 100.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Size",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "content_type"
+          ],
+          "title": "get_my_liked_music_contentsArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_my_liked_music_contentsOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get my liked music contents",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_latest_music_contents",
+        "description": "\n[Purpose] Retrieves a list of newly released songs, albums, and videos on Melon(멜론), sorted by release date.\n\n[Details] Applies region filters (domestic/international) when retrieving a list of newly released content.\n\n[Usage Guide] Use when users request newly released content regardless of ranking. —\"새로 나온 노래 뭐 있어?\", \"최신 앨범 목록 보여줘\".\n\n[Distinction] 'NEWEST' type in `get_music_chart` returns a popularity ranking of new songs,\nwhereas this tool provides a list sorted strictly by release date, regardless of popularity.\n",
+        "inputSchema": {
+          "properties": {
+            "content_type": {
+              "description": "Type of latest content on Melon (멜론) to retrieve. Choose from 'songs', 'albums', or 'videos'.",
+              "enum": [
+                "songs",
+                "albums",
+                "videos"
+              ],
+              "title": "Content Type",
+              "type": "string"
+            },
+            "region": {
+              "default": "ALL",
+              "description": "Region filter. Choose from 'ALL' (all regions), 'DOMESTIC' (Korean), or 'FOREIGN' (international). Not applicable to the 'videos' type.",
+              "enum": [
+                "ALL",
+                "IN",
+                "OUT"
+              ],
+              "title": "Region",
+              "type": "string"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number for the results.",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "limit": {
+              "default": 100,
+              "description": "Number of items to display per page.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "content_type"
+          ],
+          "title": "get_latest_music_contentsArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_latest_music_contentsOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get latest music contents",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "create_playback_url",
+        "description": "\n[Purpose] Generates a playback URL for given content (song, album, playlist, music video) on Melon(멜론).\n\n[Details] Generates and returns web URLs that allow users to play content directly.\n\n[Usage Guide]\n- Play songs: Pass a list of song_id values into the song_ids parameter.\n- Play playlists: Pass a list of playlist_seq values into the playlist_seqs parameter.\n- Play albums: Pass a list of album_id values into the album_ids parameter.\n- Play music video: Pass a single mv_id into the mv_id parameter.\n\n[Caution]\n- Use only one parameter at a time (either song_ids, playlist_seqs, album_ids, or mv_id).\n- This tool does not play content directly; it provides a playback URL that users can execute.\n",
+        "inputSchema": {
+          "properties": {
+            "song_ids": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "List of song_id values for songs to play on Melon (멜론).",
+              "title": "Song Ids"
+            },
+            "playlist_seqs": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "List of playlist_seq values for playlists to play on Melon (멜론).",
+              "title": "Playlist Seqs"
+            },
+            "album_ids": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "List of album_id values for albums to play on Melon (멜론).",
+              "title": "Album Ids"
+            },
+            "mv_id": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "ID of the music video to play on Melon (멜론). Only one video can be played at a time.",
+              "title": "Mv Id"
+            }
+          },
+          "title": "create_playback_urlArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "create_playback_urlOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Create playback URL",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": false
+        }
+      },
+      {
+        "name": "get_melon_curated_playlists",
+        "description": "\n[Purpose] Retrieves a list of official playlists curated and recommended by Melon(멜론).\n\n[Details] Retrieves playlists from Melon's official recommendation categories, such as 'Daily Pick', 'Today's Playlist', and 'Theme Recommendation'.\n\n[Usage Guide] Use when users request Melon's official recommendations. —\"멜론 추천 플레이리스트\", \"오늘의 플레이리스트\".\n\n[Distinction] If the user mentions contextual or mood-based keywords such as \"driving\" or \"workout\", use `search_melon_music_contents` tool instead of this tool.\n\n[Integration] Use the retrieved playlist IDs as input for the `create_playback_url` tool to enable direct playback.\n",
+        "inputSchema": {
+          "properties": {
+            "recommend_type": {
+              "description": "Type of curated playlist on Melon (멜론) to retrieve. 'daily' for Daily Pick, 'today' for Today's Playlist, 'theme' for theme-based recommendations.",
+              "enum": [
+                "daily",
+                "today",
+                "theme"
+              ],
+              "title": "Recommend Type",
+              "type": "string"
+            },
+            "index": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "For Daily Pick playlists, specifies a particular position (index) in the list.",
+              "title": "Index"
+            },
+            "include_songs": {
+              "default": false,
+              "description": "Whether to include the playlist's track list in the response (up to 50 songs).",
+              "title": "Include Songs",
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "recommend_type"
+          ],
+          "title": "get_melon_curated_playlistsArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "get_melon_curated_playlistsOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get Melon curated playlists",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "search_melon_music_contents",
+        "description": "\n[Purpose] Searches for all types of content on Melon(멜론)—songs, albums, artists, videos, playlists—using keywords.\n\n[Details] Performs a unified search based on user-provided keywords, or narrows the search scope by specifying a content type.\nSearch results include unique IDs that can be used in other tools.\n\n[Usage Guide]\n- Use as the primary tool for general search requests. —\"밤편지 앨범 검색해줘\", \"싫은날이라는 곡 찾아줘\", \"집중하기 좋은 음악 추천해줘\".\n- When searching for playlists or recommended songs related to mood, theme, or context (e.g., \"운동\", \"드라이브\", \"청량감\"), set content_types to 'PLAYLIST' and use clear, concise keywords.\n- When searching for music videos or popular video clips, set content_types to 'VIDEO'. —\"키키 404 뮤직비디오 보여줘\", \"MMA 인기 영상 보여줘\".\n- If no valid results are returned, retry the search by translating the keywords into English or correcting any typos.\n\n[Distinction] For searches that include genre-related keywords, use `get_music_contents_by_genre` tool instead. —\"80년대 발라드 노래 추천해줘\", \"남자 아이돌 댄스곡 추천해줘\", \"보컬 스타일 랩 추천해줘\".\n\n[Integration] If the search results are unambiguous, use the retrieved IDs with `get_music_content_details` to provide additional information,\nor pass them to `get_music_content_url` to enable direct playback.\n",
+        "inputSchema": {
+          "properties": {
+            "keyword": {
+              "description": "Search keyword for finding content on Melon (멜론). (e.g., 'IU (아이유)', 'Through the Night (밤편지)')",
+              "title": "Keyword",
+              "type": "string"
+            },
+            "content_types": {
+              "anyOf": [
+                {
+                  "items": {
+                    "enum": [
+                      "SONG",
+                      "ALBUM",
+                      "ARTIST",
+                      "VIDEO",
+                      "PLAYLIST"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null,
+              "description": "Content types to search for, from 'SONG', 'ALBUM', 'ARTIST', 'VIDEO', 'PLAYLIST'. If not specified, performs an integrated search across all types.",
+              "title": "Content Types"
+            },
+            "sort_order": {
+              "default": "POP",
+              "description": "Sort order for search results. Choose from 'POP' (popularity), 'ACC' (accuracy), or 'NEW' (newest first).",
+              "enum": [
+                "POP",
+                "ACC",
+                "NEW"
+              ],
+              "title": "Sort Order",
+              "type": "string"
+            },
+            "page": {
+              "default": 1,
+              "description": "Page number for the results.",
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            },
+            "limit": {
+              "default": 10,
+              "description": "Number of items to display per page.",
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "keyword"
+          ],
+          "title": "search_melon_music_contentsArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "search_melon_music_contentsOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Search Melon music contents",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "recommend_personalized_songs_by_dj_mallang",
+        "description": "\n[Purpose] Provides personalized song recommendations based on the user's music preference on Melon(멜론).\n\n[Details] Uses Melon's personalized recommendation engine, \"DJ Mallang (DJ말랑이)\", to comprehensively analyze the user's listening history, likes, and playlists in order to recommend new songs the user is likely to enjoy.\n\n[Usage Guide] Use when users request music recommendations without specifying criteria. —\"나한테 맞는 노래 추천해줘\", \"들을만한 노래 없어?\"\n",
+        "inputSchema": {
+          "properties": {
+            "size": {
+              "default": 50,
+              "description": "Number of recommended songs on Melon (멜론) to return. Must be between 1 and 50.",
+              "maximum": 50,
+              "minimum": 1,
+              "title": "Size",
+              "type": "integer"
+            }
+          },
+          "title": "recommend_personalized_songs_by_dj_mallangArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "recommend_personalized_songs_by_dj_mallangOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Recommend personalized songs by DJ말랑이",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "recommend_similar_songs_by_dj_mallang",
+        "description": "\n[Purpose] Recommends other songs with a similar mood or genre to the specific song on Melon(멜론).\n\n[Details] Analyzes the musical characteristics of the reference song to recommend up to 30 other songs with similar styles.\n\n[Usage Guide] Use when users request songs similar to the reference song. —\"이 노래랑 비슷한 노래 찾아줘\", \"이런 스타일의 다른 곡 추천해줘\".\n",
+        "inputSchema": {
+          "properties": {
+            "song_id": {
+              "description": "Unique ID of the song on Melon (멜론) to find similar songs for.",
+              "title": "Song Id",
+              "type": "string"
+            }
+          },
+          "required": [
+            "song_id"
+          ],
+          "title": "recommend_similar_songs_by_dj_mallangArguments",
+          "type": "object"
+        },
+        "outputSchema": {
+          "properties": {
+            "result": {
+              "title": "Result",
+              "type": "string"
+            }
+          },
+          "required": [
+            "result"
+          ],
+          "title": "recommend_similar_songs_by_dj_mallangOutput",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Recommend similar songs by DJ말랑이",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      },
+      {
+        "name": "get_song_streaming_report",
+        "description": "\n[Purpose] Provides streaming statistics or personal listening history for a specific song on Melon(멜론).\n\n[Details] Provides two types of reports depending on report_type:\n- 'public': Quickly assesses the song's overall popularity on Melon through key metrics (total streaming count, total number of listeners).\n- 'my': Shows the number of times the user has played the specific song and the date when it was first played.\n\n[Usage Guide]\n- \"이 노래 인기 많아?\", \"사람들이 이 노래 얼마나 들었어?\" → report_type=\"public\"\n- \"나 이 노래 몇 번 들었지?\", \"이 노래 언제 처음 들었어?\" → report_type=\"my\"\n",
+        "inputSchema": {
+          "properties": {
+            "song_id": {
+              "description": "Unique ID of the song on Melon (멜론) to retrieve the streaming report for.",
+              "title": "Song Id",
+              "type": "string"
+            },
+            "report_type": {
+              "description": "'public': Overall streaming count and listener statistics for the song. 'my': Personal play count and first listen date for the song.",
+              "enum": [
+                "public",
+                "my"
+              ],
+              "title": "Report Type",
+              "type": "string"
+            }
+          },
+          "required": [
+            "song_id",
+            "report_type"
+          ],
+          "title": "get_song_streaming_reportArguments",
+          "type": "object"
+        },
+        "annotations": {
+          "title": "Get song streaming report",
+          "readOnlyHint": true,
+          "destructiveHint": false,
+          "idempotentHint": true,
+          "openWorldHint": true
+        }
+      }
+    ]
+  }
+}

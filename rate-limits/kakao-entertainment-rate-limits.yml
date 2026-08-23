@@ -1,0 +1,48 @@
+generated: '2026-08-23'
+method: searched
+source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+sources:
+- https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+- https://mcp.melon.com/mcp
+limit_count: 0
+note: >-
+  No rate limits are published anywhere on the Kakao Entertainment or Melon surface. The Melon MCP
+  integration guide has an "API Limitations" section, but it covers subscription gating and regional
+  content restrictions rather than request quotas. No rate-limit response headers were observed on the
+  live anonymous tools/list exchange, and no 429 semantics are documented. An honest zero.
+limits: []
+response_headers:
+  observed: []
+  probed_on: https://mcp.melon.com/mcp
+  probe: POST tools/list (JSON-RPC 2.0), anonymous, HTTP 200
+  headers_returned:
+  - date
+  - server
+  - cache-control
+  - content-type
+  - x-accel-buffering
+  - x-envoy-upstream-service-time
+  - via
+  - alt-svc
+  note: >-
+    No X-RateLimit-*, no RateLimit-*, no Retry-After. The response is served through istio-envoy, which
+    can enforce limits without advertising them, so absence of headers is not proof of absence of
+    limits - it is proof an agent gets no runtime signal.
+exhaustion_status_code: undocumented
+schema_level_bounds:
+  note: >-
+    The only quantitative ceilings the provider publishes are per-request page-size bounds declared in
+    the tool input schemas, not rate limits. Recorded here because they are the only numbers an agent
+    can plan against.
+  maximums:
+  - param: limit
+    maximum: 100
+  - param: size
+    maximum_observed:
+    - 30
+    - 50
+    - 100
+  - param: start
+    maximum_observed: 100
+  - tool: recommend_similar_songs_by_dj_mallang
+    ceiling: up to 30 similar songs returned per call, per the tool description

@@ -1,0 +1,111 @@
+generated: '2026-08-23'
+method: probed
+source: Direct HTTP probes of every Kakao Entertainment / Melon host on 2026-08-23
+note: >-
+  One real /.well-known document was found across the whole estate: RFC 8414 OAuth 2.0 Authorization
+  Server Metadata for the Melon Alliance Auth v3 platform. It is not served at the MCP host itself —
+  https://mcp.melon.com/.well-known/oauth-authorization-server answers 301 and redirects to
+  https://cola.melon.com/.well-known/oauth-authorization-server, which returns the document. Both the
+  redirect and the served document are recorded below. No security.txt, no OpenID Connect discovery,
+  no api-catalog, no ai-plugin.json and no agent card were served anywhere. www.melon.com returns HTTP
+  500 for /.well-known/* JSON paths and 404 for the rest; page.kakao.com returns 403 to our crawler for
+  every path including the site root's siblings; webtoon.kakao.com 302s every /.well-known/* path.
+  None of those are documents and none earn a pointer.
+hit_count: 1
+hosts:
+- host: https://cola.melon.com
+  documents:
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: kakao-entertainment-oauth-authorization-server.json
+    content_type: application/json
+    note: RFC 8414 metadata for Melon Alliance Auth v3; carries scopes_supported and a DCR endpoint.
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: https://mcp.melon.com
+  documents:
+  - path: /.well-known/oauth-authorization-server
+    status: 301
+    redirect: https://cola.melon.com/.well-known/oauth-authorization-server
+    note: Redirect only - the document is served by the authorization server host, recorded above.
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/oauth-protected-resource/mcp
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+- host: https://kakaoent.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: https://www.melon.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 500
+  - path: /.well-known/agent-card.json
+    status: 500
+  - path: /.well-known/agent.json
+    status: 500
+- host: https://page.kakao.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+  - path: /.well-known/agent-card.json
+    status: 403
+  - path: /.well-known/agent.json
+    status: 403
+- host: https://webtoon.kakao.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 302
+  - path: /.well-known/agent-card.json
+    status: 302
+  - path: /.well-known/agent.json
+    status: 302
+soft_404_control:
+  note: >-
+    api.kakaoent.com is a blanket catch-all - every path probed (/openapi.json, /swagger.json,
+    /api-docs, /docs, /llms.txt and every /.well-known/*) returns HTTP 200 with an identical 769-byte
+    HTML error shell that redirects to https://start.kakaoent.com/error.html. No path on that host was
+    treated as a document.
+  host: https://api.kakaoent.com
+  probe: /openapi.json
+  status: 200
+  bytes: 769
+  content_type: text/html

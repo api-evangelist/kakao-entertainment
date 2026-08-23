@@ -1,23 +1,106 @@
 aid: kakao-entertainment
 name: Kakao Entertainment
-description: 'Kakao Entertainment is a company surfaced via the API Evangelist harvest backlog (source:
-  secondary-market) and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  Kakao Entertainment Corp. is the South Korean entertainment subsidiary of Kakao Corp., formed from
+  the 2021 merger of Kakao Page and Kakao M. It operates three business lines — Story (Kakao Page and
+  Kakao Webtoon serialized webtoon and web-novel platforms, plus the overseas Tapas and Radish
+  properties), Music (the Melon streaming service and the StarShip, IST, EDAM and Antenna labels), and
+  Media (film, drama and artist management). Its public machine-readable API surface is agent-native
+  rather than REST: Melon publishes a first-party remote Model Context Protocol (MCP) server at
+  https://mcp.melon.com/mcp, in beta, exposing 18 anonymously-introspectable tools for music search,
+  official Melon charts, artist and album detail, genre browsing, personalized DJ Mallang
+  recommendations, listening history and playlist/playback URL generation. Access is authenticated
+  with OAuth 2.0 against the Melon Alliance Auth v3 platform, which publishes RFC 8414 authorization
+  server metadata and an RFC 7591 dynamic client registration endpoint. Kakao Entertainment publishes
+  no OpenAPI, no REST developer portal, and no SDKs; the corporate site and the Melon consumer
+  properties carry no developer program. Kakao Corp's general developer platform at
+  developers.kakao.com belongs to the parent company and is profiled separately as `kakao`.
 url: https://raw.githubusercontent.com/api-evangelist/kakao-entertainment/refs/heads/main/apis.yml
+image: https://www.kakaoent.com/favicon.ico
 x-type: company
 x-source: harvest:secondary-market
-x-tier: stub
-x-tier-reason: harvest
 specificationVersion: '0.20'
 created: '2026-08-23'
 modified: '2026-08-23'
 tags:
+- Entertainment
+- Music
+- Streaming
+- Webtoons
+- Publishing
+- Media
+- Model Context Protocol
+- Agents
+- South Korea
 - Company
-apis: []
+apis:
+- aid: kakao-entertainment-melon-mcp
+  name: Melon MCP Server
+  description: >-
+    Melon's first-party remote Model Context Protocol server, published by Kakao Entertainment's AI
+    Application Technology team. Streamable HTTP transport at https://mcp.melon.com/mcp, OAuth 2.0
+    authenticated, currently beta. An anonymous tools/list call returns 18 tools with full JSON Schema
+    input contracts covering music search, official charts, content and artist detail, genre browsing,
+    curated and personalized recommendations, the signed-in user's liked/recent/most-listened history
+    and playlists, and playback URL generation. Officially supported clients are Claude.ai / Claude
+    Desktop and Kakao PlayMCP; OAuth redirect URI allowlisting and client credential issuance are
+    managed by Melon on a per-partner allowlist.
+  humanURL: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+  baseURL: https://mcp.melon.com/mcp
+  tags:
+  - Music
+  - Model Context Protocol
+  - Agents
+  - Streaming
+  properties:
+  - type: MCPServer
+    url: mcp/kakao-entertainment-mcp.yml
+  - type: Documentation
+    url: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: DomainSecurity
+  url: security/kakao-entertainment-domain-security.yml
 - type: Website
-  url: https://www.nasdaqprivatemarket.com/
+  url: https://www.kakaoent.com/
+- type: Blog
+  url: https://tech.kakaoent.com/
+- type: BlogRSS
+  url: https://tech.kakaoent.com/rss.xml
+- type: GitHubOrganization
+  url: https://github.com/kakaoent
+- type: PrivacyPolicy
+  url: https://kakaoent.com/privacy/policy
+- type: MCPServer
+  url: mcp/kakao-entertainment-mcp.yml
+- type: Authentication
+  url: authentication/kakao-entertainment-authentication.yml
+- type: OAuthScopes
+  url: scopes/kakao-entertainment-scopes.yml
+- type: WellKnown
+  url: well-known/kakao-entertainment-well-known.yml
+- type: Conformance
+  url: conformance/kakao-entertainment-conformance.yml
+- type: Conventions
+  url: conventions/kakao-entertainment-conventions.yml
+- type: ErrorCatalog
+  url: errors/kakao-entertainment-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/kakao-entertainment-lifecycle.yml
+- type: Plans
+  url: plans/kakao-entertainment-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/kakao-entertainment-rate-limits.yml
+- type: LLMsTxt
+  url: llms/kakao-entertainment-llms.txt
+- type: AgentSkill
+  url: skills/_index.yml
+x-enrichment:
+  date: '2026-08-23'
+  status: enriched
+  artifacts_added: 18
+  pass: local-v1

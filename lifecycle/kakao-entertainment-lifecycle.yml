@@ -1,0 +1,64 @@
+generated: '2026-08-23'
+method: searched
+source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+sources:
+- https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+- https://cola.melon.com/auth/v3/oauth/docs
+- https://mcp.melon.com/mcp
+note: >-
+  Lifecycle posture read from the provider's own published statements and from live probes on
+  2026-08-23. Kakao Entertainment publishes no API changelog, no deprecation policy, no SLA and no
+  status page for any of its public surfaces; those are recorded as absent rather than omitted.
+maturity:
+  stage: beta
+  declared_by_provider: true
+  statement: >-
+    "By enabling this app integration, you acknowledge that you are using an experimental Model Context
+    Protocol (MCP) server to connect Melon with external large language models (LLMs). As this is an
+    experimental beta tool, it is provided on an 'as is' basis. You may encounter bugs, errors, or
+    unexpected results."
+  source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+  first_published: '2025-09-19'
+  first_published_source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+versioning:
+  policy_published: false
+  api_version: none
+  note: >-
+    The MCP endpoint carries no version segment and no version is declared in the tool set. The Melon
+    Alliance Auth v3 authorization platform is separately versioned in its path (/auth/v3/), which is
+    the only version marker anywhere on the surface.
+deprecation:
+  policy_published: false
+  sunset_header: not observed
+  deprecation_header: not observed
+  rfc8594: false
+  deprecated_operations: []
+  note: >-
+    No deprecation policy, no notice period, and no RFC 8594 Sunset/Deprecation header usage is
+    published or was observed. No Deprecation pointer is emitted.
+status_page:
+  published: false
+  probed:
+  - url: https://status.melon.com/
+    result: DNS does not resolve
+  note: >-
+    No status page was found for the MCP server, for Melon, or for Kakao Entertainment. No StatusPage
+    pointer is emitted.
+sla:
+  published: false
+  note: >-
+    None. The provider explicitly disclaims reliability - the server is offered "as is" as an
+    experimental beta tool.
+changelog:
+  published: false
+  note: >-
+    There is no dated API changelog. The only dated record of the surface is the engineering blog post
+    that introduced it (2025-09-19, in Korean and English), and the blog is a general engineering blog
+    rather than an API release feed. No ChangeLog pointer is emitted.
+  nearest_surface: https://tech.kakaoent.com/rss.xml
+observed_drift:
+  note: >-
+    The live tool set has already diverged from the launch documentation - six tools named in the guide
+    are absent from the running server and five tools on the running server are unnamed in the guide.
+    With no changelog, a consumer has no way to learn when that happened.
+  detail: mcp/kakao-entertainment-mcp.yml#documentation_divergence

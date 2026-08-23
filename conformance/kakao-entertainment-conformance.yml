@@ -1,0 +1,121 @@
+generated: '2026-08-23'
+method: probed
+source: https://cola.melon.com/.well-known/oauth-authorization-server
+sources:
+- https://cola.melon.com/.well-known/oauth-authorization-server
+- https://cola.melon.com/auth/v3/oauth/docs
+- https://cola.melon.com/auth/v3/oauth/docs/dynamic-client-registration
+- https://mcp.melon.com/mcp
+note: >-
+  Every conformance assertion below is evidenced against a document or a live response fetched
+  anonymously on 2026-08-23. Melon Alliance Auth v3 states its own standards posture on its docs index
+  and lists the RFCs it implements; the MCP conformance rows are evidenced by a live JSON-RPC
+  tools/list exchange. Nothing is asserted from a marketing claim.
+standards:
+- id: oauth2
+  name: OAuth 2.0 Authorization Framework (RFC 6749)
+  conforms: true
+  evidence: >-
+    Provider docs index states "Melon Alliance Auth v3 is a standards-compliant authorization platform
+    that implements OAuth 2.0 and OAuth 2.1 (draft)" and cites RFC 6749. Metadata declares
+    grant_types_supported [authorization_code, refresh_token] and response_types_supported [code].
+  source: https://cola.melon.com/auth/v3/oauth/docs
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence: >-
+    /.well-known/oauth-authorization-server returns HTTP 200 application/json carrying issuer,
+    authorization_endpoint, token_endpoint, introspection_endpoint, revocation_endpoint,
+    registration_endpoint, scopes_supported and code_challenge_methods_supported.
+  source: https://cola.melon.com/.well-known/oauth-authorization-server
+- id: rfc7636
+  name: PKCE - Proof Key for Code Exchange
+  conforms: true
+  evidence: 'Metadata declares code_challenge_methods_supported: ["S256"]; the docs index cites RFC 7636.'
+  source: https://cola.melon.com/.well-known/oauth-authorization-server
+- id: rfc7591
+  name: OAuth 2.0 Dynamic Client Registration Protocol
+  conforms: true
+  evidence: >-
+    A dedicated DCR document specifies POST /auth/v3/oauth/register with an RFC 7591 request/response
+    shape (client_name, redirect_uris in; client_id, client_secret, client_id_issued_at,
+    client_secret_expires_at, grant_types, response_types, token_endpoint_auth_method out). Metadata
+    declares registration_endpoint and registration_endpoint_auth_methods_supported ["none"].
+    Registration is allowlist-gated per partner, which the provider states explicitly.
+  source: https://cola.melon.com/auth/v3/oauth/docs/dynamic-client-registration
+- id: rfc6750
+  name: OAuth 2.0 Bearer Token Usage
+  conforms: true
+  evidence: Cited by the provider on the Melon Alliance Auth v3 documentation index.
+  source: https://cola.melon.com/auth/v3/oauth/docs
+- id: rfc7009
+  name: OAuth 2.0 Token Revocation
+  conforms: true
+  evidence: >-
+    Cited by the provider on the documentation index and backed by a declared revocation_endpoint
+    (https://cola.melon.com/auth/v3/oauth/revoke) in the RFC 8414 metadata.
+  source: https://cola.melon.com/auth/v3/oauth/docs
+- id: oauth21
+  name: OAuth 2.1 (draft)
+  conforms: partial
+  evidence: >-
+    Provider states the platform implements OAuth 2.1 (draft). Consistent with the metadata - only the
+    authorization_code and refresh_token grants are offered, only the code response type, and PKCE S256
+    is advertised. Recorded as partial because OAuth 2.1 is a draft and the provider does not publish a
+    conformance statement against a specific draft revision.
+  source: https://cola.melon.com/auth/v3/oauth/docs
+- id: openid-connect
+  name: OpenID Connect Discovery
+  conforms: false
+  evidence: >-
+    /.well-known/openid-configuration returns HTTP 404 on cola.melon.com and on mcp.melon.com. The
+    platform is OAuth 2.0/2.1, not OIDC, despite issuing identity-bearing scopes (memberKey,
+    memberName, ipinGender, ipinBirthDate, realNameYn).
+  source: https://cola.melon.com/.well-known/openid-configuration
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata
+  conforms: false
+  evidence: >-
+    /.well-known/oauth-protected-resource and /.well-known/oauth-protected-resource/mcp both return 404
+    on mcp.melon.com. The MCP resource does not advertise its own authorization servers per RFC 9728;
+    discovery works only because mcp.melon.com 301s /.well-known/oauth-authorization-server to
+    cola.melon.com.
+  source: https://mcp.melon.com/.well-known/oauth-protected-resource
+- id: rfc9457
+  name: Problem Details for HTTP APIs
+  conforms: false
+  evidence: >-
+    No application/problem+json surface was observed. The MCP server returns JSON-RPC 2.0 framing over
+    text/event-stream; errors are described in prose in the integration guide rather than as a typed
+    catalogue.
+  source: https://mcp.melon.com/mcp
+domain_standards:
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  role: The agent-integration standard for this provider's only public machine-readable surface.
+  evidence: >-
+    POST https://mcp.melon.com/mcp with a JSON-RPC 2.0 tools/list request returns HTTP 200
+    text/event-stream carrying result.tools[] with 18 tools, each with a JSON Schema inputSchema. The
+    contract declares itself by responding to the protocol, not by claiming it in prose.
+  transport: streamable-http
+  spec_location: mcp/kakao-entertainment-melon-tools-list.json
+  source: https://mcp.melon.com/mcp
+- id: json-schema
+  name: JSON Schema (tool input contracts)
+  conforms: true
+  evidence: >-
+    Every one of the 18 tools returned by tools/list carries an inputSchema object with typed
+    properties, enums, minimum/maximum bounds, defaults and a required list - the machine-readable
+    parameter contract this provider ships in place of an OpenAPI.
+  source: https://mcp.melon.com/mcp
+domain_standard_note: >-
+  Music streaming and webtoon publishing have no widely adopted machine-readable interchange standard
+  of the SCIM / OData / FHIR / OpenRTB class, so no market-specific domain standard is asserted here.
+  Recording an absence rather than inventing a conformance.
+certifications: []
+certifications_note: >-
+  No trust centre, no published SOC 2 / ISO 27001 / PCI / HIPAA certification page and no compliance
+  programme documentation was found on any Kakao Entertainment or Melon host. The corporate site serves
+  a Korean-language ethics/compliance page at https://kakaoent.com/compliance, which is a corporate
+  ethics statement rather than a security-certification disclosure, so no Compliance pointer is emitted.

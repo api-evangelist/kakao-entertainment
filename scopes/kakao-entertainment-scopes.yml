@@ -1,0 +1,47 @@
+generated: '2026-08-23'
+method: probed
+source: https://cola.melon.com/.well-known/oauth-authorization-server
+note: Scopes read verbatim from scopes_supported in the provider's RFC 8414 authorization server metadata
+  document. Kakao Entertainment publishes no scope reference page, so no scope descriptions are published
+  by the provider; the description field below is an API Evangelist reading of the scope name and is marked
+  as such, not a provider statement. No scope-to-tool mapping is published for the Melon MCP server.
+authorization_server: https://cola.melon.com
+documentation: null
+description_provenance: api-evangelist-reading (provider publishes names only)
+scope_count: 10
+scopes:
+- scope: melonAuthentication
+  description: Authenticate the end user against their Melon account.
+  source: scopes_supported
+- scope: melonAccessAuthority
+  description: Access authority / permission level held by the Melon member.
+  source: scopes_supported
+- scope: melonService
+  description: Access to Melon service functionality on behalf of the member.
+  source: scopes_supported
+- scope: memberKey
+  description: The member key identifying the Melon account.
+  source: scopes_supported
+- scope: memberName
+  description: The member name on the Melon account.
+  source: scopes_supported
+- scope: memberNickname
+  description: The member nickname on the Melon account.
+  source: scopes_supported
+- scope: ipinGender
+  description: Gender as verified through the Korean i-PIN identity verification service.
+  source: scopes_supported
+- scope: ipinBirthDate
+  description: Birth date as verified through the Korean i-PIN identity verification service.
+  source: scopes_supported
+- scope: realNameYn
+  description: Whether the member has completed real-name verification.
+  source: scopes_supported
+- scope: ticketService
+  description: Access to the member's Melon ticket / subscription (voucher) service state.
+  source: scopes_supported
+x-evidence:
+  fetched: '2026-08-23'
+  url: https://cola.melon.com/.well-known/oauth-authorization-server
+  http_status: 200
+  content_type: application/json

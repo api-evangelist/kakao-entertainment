@@ -1,0 +1,71 @@
+generated: '2026-08-23'
+method: searched
+source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+sources:
+- https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+- https://cola.melon.com/auth/v3/oauth/docs/dynamic-client-registration
+- https://mcp.melon.com/mcp
+format: jsonrpc
+rfc9457: false
+note: >-
+  Kakao Entertainment publishes no OpenAPI and no error-code registry, so there are no 4xx/5xx response
+  objects to derive from. The entries below are the error conditions the provider actually names in its
+  own documentation, plus the OAuth error the DCR document names. Codes are not published; each entry
+  records the provider's own label. Nothing is invented and no numeric code has been assigned.
+envelope:
+  style: JSON-RPC 2.0
+  transport: text/event-stream over Streamable HTTP
+  fields_observed:
+  - jsonrpc
+  - id
+  - result
+  note: >-
+    Only successful tools/list responses were observed anonymously. The provider does not publish the
+    error object shape, so the error member layout is recorded as unverified.
+problem_types:
+- name: content-not-found
+  provider_label: Content Not Found
+  surface: mcp-tool
+  meaning: The supplied content ID or search query did not resolve to Melon content.
+  remediation: Verify the content ID or the search query. IDs are returned by search, chart and detail tools.
+  source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+- name: permission-denied
+  provider_label: Permission Denied
+  surface: mcp-tool
+  meaning: The authorized Melon account lacks the permission or subscription state the tool requires.
+  remediation: >-
+    Check Melon account permissions and subscription status. The provider states some features require
+    an active Melon subscription and that personalization features in particular do.
+  source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+- name: invalid-redirect-uri
+  provider_label: invalid_redirect_uri
+  surface: oauth
+  meaning: >-
+    The redirect URI presented during the OAuth flow is not on Melon's per-partner allowlist, or is
+    malformed.
+  remediation: >-
+    Register the redirect URI with Melon before use. The provider directs partners to Melon Customer
+    Support at melon_info@kakaoent.com; registration requests with disallowed or malformed redirect
+    URIs are rejected.
+  source: https://cola.melon.com/auth/v3/oauth/docs/dynamic-client-registration
+- name: transport-unsupported
+  provider_label: Connection Problems
+  surface: mcp-transport
+  meaning: >-
+    The MCP client negotiated SSE rather than Streamable HTTP, or could not complete the OAuth flow.
+  remediation: >-
+    Use a client that implements Streamable HTTP transport and can handle an OAuth 2.0 authorization
+    code flow. The provider names Claude.ai / Claude Desktop and Kakao PlayMCP as officially supported.
+  source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+- name: regional-restriction
+  provider_label: API Limitations
+  surface: mcp-tool
+  meaning: Certain catalogue content is subject to regional licensing restrictions.
+  remediation: >-
+    No remediation is published. Tools that expose a service_available flag (get_playlist_tracks) can be
+    used to filter tracks that are not currently streamable.
+  source: https://tech.kakaoent.com/ai/using-melon-mcp-server-en/
+gaps:
+- No numeric or symbolic error codes are published.
+- No error response schema, no problem+json, no error catalogue page.
+- HTTP status codes for tool-level failures are not documented.
