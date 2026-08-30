@@ -1,0 +1,21 @@
+{
+  "repo": "kakao-entertainment",
+  "feeds": [
+    {
+      "source": "https://www.kakaoent.com/",
+      "feed_url": "https://www.kakaoent.com/",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    },
+    {
+      "source": "https://tech.kakaoent.com/",
+      "feed_url": "https://tech.kakaoent.com/",
+      "title": "",
+      "saved": 0,
+      "method": "none"
+    }
+  ],
+  "post_count": 0,
+  "fetched": "2026-08-30T22:33:40Z"
+}
