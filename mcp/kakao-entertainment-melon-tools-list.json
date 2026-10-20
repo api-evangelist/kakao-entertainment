@@ -1,6 +1,12 @@
 {
-  "jsonrpc": "2.0",
-  "id": 1,
+  "endpoint": "https://mcp.melon.com/mcp",
+  "captured": "2026-10-20",
+  "method": "initialize + tools/list (anonymous, no tool called; roadmap#992)",
+  "protocol_version": "2025-06-18",
+  "server_info": {
+    "name": "Melon MCP Server",
+    "version": "1.12.4"
+  },
   "result": {
     "tools": [
       {
