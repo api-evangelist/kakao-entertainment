@@ -64,5 +64,113 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Kakao Entertainment is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://www.nasdaqprivatemarket.com/
+Kakao Entertainment Corp. is the South Korean entertainment subsidiary of Kakao Corp., formed from the 2021 merger of Kakao Page and Kakao M. It operates three business lines — Story (Kakao Page and Kakao Webtoon serialized webtoon and web-novel platforms, plus the overseas Tapas and Radish properties), Music (the Melon streaming service and the StarShip, IST, EDAM and Antenna labels), and Media (film, drama and artist management). Its public machine-readable API surface is agent-native rather than REST: Melon publishes a first-party remote Model Context Protocol (MCP) server at https://mcp.melon.com/mcp, in beta, exposing 18 anonymously-introspectable tools for music search, official Melon charts, artist and album detail, genre browsing, personalized DJ Mallang recommendations, listening history and playlist/playback URL generation. Access is authenticated with OAuth 2.0 against the Melon Alliance Auth v3 platform, which publishes RFC 8414 authorization server metadata and an RFC 7591 dynamic client registration endpoint. Kakao Entertainment publishes no OpenAPI, no REST developer portal, and no SDKs; the corporate site and the Melon consumer properties carry no developer program. Kakao Corp's general developer platform at developers.kakao.com belongs to the parent company and is profiled separately as `kakao`.
+
+**Areas:** Entertainment · Music · Streaming · Webtoons · Publishing · Media · MCP · Agents · South Korea · Company
+
+## Kakao Entertainment on APIs.io
+
+Everything profiled for Kakao Entertainment is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/kakao-entertainment/](https://apis.io/providers/kakao-entertainment/)** — or go straight to one of the APIs or properties below.
+
+### APIs (1)
+
+- [Melon MCP Server](https://apis.io/apis/kakao-entertainment/kakao-entertainment-melon-mcp/) — Melon's first-party remote Model Context Protocol server, published by Kakao Entertainment's AI Application Technology team. Streamable HTTP transport at…
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [melon](https://apis.io/servers/kakao-entertainment/melon/)
+
+#### Security (2)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Kakao Entertainment Authentication](https://apis.io/security/kakao-entertainment/kakao-entertainment-authentication/)
+- [Kakao Entertainment Domain Security](https://apis.io/security/kakao-entertainment/kakao-entertainment-domain-security/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Kakao Entertainment Scopes](https://apis.io/scopes/kakao-entertainment/kakao-entertainment-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Kakao Entertainment Plans Pricing](https://apis.io/plans/kakao-entertainment/kakao-entertainment-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Kakao Entertainment Rate Limits](https://apis.io/rate-limits/kakao-entertainment/kakao-entertainment-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.kakaoent.com/)
+- [Blog](https://tech.kakaoent.com/)
+- [Privacy policy](https://kakaoent.com/privacy/policy)
+- [GitHub](https://github.com/kakaoent)
+
+## API Evangelist rating
+
+**Kin Score 18.9** — emerging · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 68.3 |
+| Contract quality | 0.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 2.6 |
+| Developer ergonomics | 25.6 |
+| Access clarity | 10.5 |
+
+**Agent readiness 30.0** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | verified |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | na |
+
+**Regulatory alignment 30.4** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/kakao-entertainment/](https://apis.io/providers/kakao-entertainment/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Kakao Entertainment: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/kakao-entertainment/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
